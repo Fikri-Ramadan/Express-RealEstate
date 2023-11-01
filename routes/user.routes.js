@@ -13,11 +13,11 @@ const router = express.Router();
 
 router.post('/', jwtCheck, register);
 
-router.get('/bookvisit', getAllBookedVisits);
+router.post('/bookvisit', jwtCheck, getAllBookedVisits);
 router.post('/bookvisit/:id', jwtCheck, bookVisit);
 router.delete('/bookvisit/:id', jwtCheck, cancelBookedVisits);
 
-router.get('/favourites', jwtCheck, getAllfavourites);
+router.post('/favourites', jwtCheck, getAllfavourites);
 router.put('/togglefavourite/:id', jwtCheck, togglefavourite);
 
 export { router as userRoutes };
