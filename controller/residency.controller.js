@@ -42,7 +42,11 @@ export const create = asyncHandler(async (req, res) => {
 
 export const getAll = asyncHandler(async (req, res) => {
   try {
-    const residencies = await prisma.residency.findMany();
+    const residencies = await prisma.residency.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     return res.status(200).json({ residencies });
   } catch (error) {
