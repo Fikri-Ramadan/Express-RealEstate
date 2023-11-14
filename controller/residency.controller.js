@@ -41,14 +41,26 @@ export const create = asyncHandler(async (req, res) => {
 });
 
 export const getAll = asyncHandler(async (req, res) => {
+  const { page } = req.query;
+
+  const totalResidencies = await prisma.residency.count();
+
+  const limit = 8;
+  const totalPage = Math.ceil(totalResidencies / limit);
+
+  const skip = ((page || 1) - 1) * limit;
+  const take = limit;
+
   try {
     const residencies = await prisma.residency.findMany({
+      skip: skip,
+      take: take,
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return res.status(200).json({ residencies });
+    return res.status(200).json({ residencies, totalPage });
   } catch (error) {
     throw new Error(error.message);
   }
