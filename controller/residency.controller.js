@@ -42,8 +42,32 @@ export const create = asyncHandler(async (req, res) => {
 
 export const getAll = asyncHandler(async (req, res) => {
   const { page } = req.query;
+  const { search } = req.query;
 
-  const totalResidencies = await prisma.residency.count();
+  const searchQuery = {
+    OR: [
+      {
+        title: {
+          contains: search || '',
+          mode: 'insensitive',
+        },
+      },
+      {
+        city: {
+          contains: search || '',
+          mode: 'insensitive',
+        },
+      },
+      {
+        country: {
+          contains: search || '',
+          mode: 'insensitive',
+        },
+      },
+    ],
+  };
+
+  const totalResidencies = await prisma.residency.count({ where: searchQuery });
 
   const limit = 8;
   const totalPage = Math.ceil(totalResidencies / limit);
@@ -55,12 +79,13 @@ export const getAll = asyncHandler(async (req, res) => {
     const residencies = await prisma.residency.findMany({
       skip: skip,
       take: take,
+      where: searchQuery,
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return res.status(200).json({ residencies, totalPage });
+    return res.status(200).json({ totalPage, totalResidencies, residencies });
   } catch (error) {
     throw new Error(error.message);
   }
